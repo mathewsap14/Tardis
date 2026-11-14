@@ -42,7 +42,7 @@ main{flex:1;display:grid;gap:12px;grid-template-columns:1fr;min-height:0}
 input.txt{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--fg);padding:12px;font-size:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
 .hist h3{margin:0 0 4px;font-size:20px}.hist .sub{color:var(--acc);font-weight:600;font-size:14px;margin-bottom:8px}
-.hist p{margin:0;color:#cfd5e0}
+.hist p{margin:0 0 10px;color:#2b4568}.hist .sub{color:var(--acc)}
 .who{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:8px}
 .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;color:var(--mut)}
 #yv{font-size:34px;font-weight:800;color:var(--acc);line-height:1}
@@ -81,6 +81,7 @@ li.pl{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px s
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 <script src="photos.js"></script>
 <script>
+const ROUNDS=window.PHOTOS||[];
 const MIN=1830,MAX=2026,$=document.getElementById('app');
 const COL=['#f2a33a','#4cc9f0','#ef476f','#06d6a0','#b388ff','#ffd166','#ff8fab','#9ef01a'];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -172,7 +173,7 @@ function reveal(){
   L.polyline([[x.lat,x.lng],[r.lat,r.lng]],{color:c,dashArray:'6',weight:3}).addTo(map)});
  map.fitBounds(pts,{padding:[50,50],maxZoom:7});
  const page=r.page||('https://commons.wikimedia.org/wiki/File:'+encodeURIComponent((r.f||r.t||'').replace(/^File:/,'')));
- hist.hidden=false;hist.innerHTML=`<h3>${esc(r.p)}</h3><div class=sub>${r.y}</div><p>${esc(r.h)}</p><div class=credit>${r.a?esc(r.a)+' · ':''}${r.l?esc(r.l)+' · ':''}<a href="${esc(page)}" target=_blank rel=noopener>Photo on Wikimedia Commons</a></div>`;
+ hist.hidden=false;hist.innerHTML=`<h3>${esc(r.p)}</h3><div class=sub>${r.y}</div>${r.h.split(String.fromCharCode(10,10)).map(t=>`<p>${esc(t)}</p>`).join('')}<div class=credit>${r.a?esc(r.a)+' · ':''}${r.l?esc(r.l)+' · ':''}<a href="${esc(page)}" target=_blank rel=noopener>Photo on Wikimedia Commons</a></div>`;
  const last=G.i+1>=G.rs.length,canNext=!NET||NET.role==='host';
  panel.innerHTML=`<div class=truth>It was ${esc(r.p)}, ${r.y}</div><div class=res>${R.map((x,i)=>x&&!x.skipped?`<div class=pr><span class=dot style="background:${COL[i%8]}"></span><div>${esc(G.players[i])}<small>${x.d.toLocaleString()} km off · ${x.gy} (${x.dy} yr off)</small></div><b class=s>${x.s}</b></div>`:`<div class=pr><span class=dot style="background:${COL[i%8]}"></span><div>${esc(G.players[i])}<small>No guess</small></div><b class=s>0</b></div>`).join('')}</div>
  ${canNext?`<button class=btn id=nx>${last?'See results':'Next round'}</button>`:'<p class=hint>Waiting for the host to continue…</p>'}`;

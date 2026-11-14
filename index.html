@@ -1,57 +1,167 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#14110f"><link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f1115"><link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes"><title>Tardis</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-:root{--bg:#14110f;--card:#221d19;--fg:#f4ece3;--mut:#a89d92;--acc:#f2a33a}
-*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:16px system-ui,sans-serif}
-#app{height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-header{display:flex;justify-content:space-between;padding:10px 16px;color:var(--mut);font-size:14px}
-#photo{flex:1 1 40%;min-height:0;background:#000 center/contain no-repeat}
-#map{flex:1 1 30%;min-height:0}
-#panel{padding:12px 16px;background:var(--card)}
-#year{width:100%;accent-color:var(--acc)}
-.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-#yv{font-size:28px;font-weight:700;color:var(--acc)}
-button{width:100%;padding:14px;border:0;border-radius:10px;background:var(--acc);color:#14110f;font-size:17px;font-weight:700}
-button:disabled{opacity:.4}
-.center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:24px;text-align:center}
-.center button{max-width:320px}h1{font-size:40px;margin:0}.big{font-size:44px;color:var(--acc);font-weight:700}
-.res{color:var(--mut);margin:6px 0 10px;line-height:1.5}.res b{color:var(--fg)}
+:root{--bg:#0f1115;--card:#181b22;--card2:#1f232c;--line:#2a2f3a;--fg:#eef1f6;--mut:#8f98a8;--acc:#f2a33a;--r:16px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input{font:inherit}
+.shell{min-height:100dvh;display:flex;flex-direction:column;padding:max(12px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));gap:12px;max-width:1500px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.3px;font-size:18px}
+.brand svg{width:26px;height:26px}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:14px;color:var(--mut)}
+.chips{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:14px}
+.chip.on{border-color:var(--acc)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+main{flex:1;display:grid;gap:12px;grid-template-columns:1fr;min-height:0}
+.left,.right{display:flex;flex-direction:column;gap:12px;min-height:0}
+.photo{background:#000;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);height:42vh;display:flex;align-items:center;justify-content:center}
+.photo img{width:100%;height:100%;object-fit:contain;display:block}
+#map{height:40vh;border-radius:var(--r);border:1px solid var(--line);overflow:hidden;z-index:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.hist h3{margin:0 0 4px;font-size:20px}.hist .sub{color:var(--acc);font-weight:600;font-size:14px;margin-bottom:8px}
+.hist p{margin:0;color:#cfd5e0}
+.who{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;color:var(--mut)}
+#yv{font-size:34px;font-weight:800;color:var(--acc);line-height:1}
+input[type=range]{width:100%;accent-color:var(--acc);height:32px}
+.btn{width:100%;padding:14px;border:0;border-radius:12px;background:var(--acc);color:#15110a;font-weight:800;font-size:17px;cursor:pointer;margin-top:10px}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.ghost{background:var(--card2);color:var(--fg);border:1px solid var(--line)}
+.sm{border:1px solid var(--line);background:var(--card2);color:var(--fg);border-radius:10px;padding:8px 14px;cursor:pointer}
+.res{display:flex;flex-direction:column;gap:8px}
+.pr{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.pr:last-of-type{border:0}.pr small{color:var(--mut);display:block}.pr b.s{font-size:20px;color:var(--acc)}
+.truth{font-weight:700;margin-bottom:6px}
+.setup{max-width:560px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:14px;padding-top:4vh}
+.setup h1{margin:0;font-size:42px;letter-spacing:.5px}.setup .tag{color:var(--mut);margin:-6px 0 6px}
+.setup h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mut)}
+.stepper{display:flex;align-items:center;gap:18px}.stepper b{font-size:34px;min-width:50px;text-align:center}
+.stepper .sm{width:44px;height:44px;font-size:22px;padding:0}
+ul{list-style:none;margin:0 0 10px;padding:0}
+li.pl{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}li.pl span.n{flex:1}
+.add{display:flex;gap:8px}.add input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--fg);padding:10px 12px;min-width:0}
+.final{max-width:560px;margin:4vh auto 0;width:100%;text-align:center}
+.final h1{font-size:34px;margin:0 0 4px}.lb{display:flex;flex-direction:column;text-align:left;margin:14px 0}
+.lb .pr{grid-template-columns:28px auto 1fr auto}
+.marker{width:26px;height:26px;border-radius:50%;border:3px solid #fff;color:#111;font:700 13px/20px system-ui;text-align:center;box-shadow:0 1px 6px #0008}
+.star{font-size:30px;line-height:30px;text-shadow:0 1px 6px #000}
+@media(min-width:860px){
+ .shell{height:100dvh;padding-bottom:14px}
+ main{grid-template-columns:1.15fr 1fr;overflow:hidden}
+ .photo{height:auto;flex:1}.left.rev .photo{flex:0 0 46%}
+ #map{height:auto;flex:1}
+ .left,.right{overflow:auto}
+ .setup{padding-top:6vh}
+}
 </style></head><body><div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-const F=n=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(n)+'?width=1400';
-// Add more rounds here: photo (Wikimedia Commons file name), year, lat, lng, place
+const F=n=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(n)+'?width=1600';
+// To add a photo: Wikimedia Commons file name (f), year (y), lat/lng, place (p), short history (h)
 const ROUNDS=[
-{f:'Lunch atop a Skyscraper - Charles Clyde Ebbets.jpg',y:1932,lat:40.7587,lng:-73.9787,p:'Rockefeller Center, New York'},
-{f:'Lange-MigrantMother02.jpg',y:1936,lat:35.0422,lng:-120.4749,p:'Nipomo, California'},
-{f:'Raising the Flag on Iwo Jima, larger - edit1.jpg',y:1945,lat:24.7536,lng:141.2889,p:'Iwo Jima, Japan'},
-{f:'Hindenburg disaster.jpg',y:1937,lat:40.03,lng:-74.353,p:'Lakehurst, New Jersey'},
-{f:'Dust Bowl - Dallas, South Dakota 1936.jpg',y:1936,lat:43.23,lng:-99.51,p:'Dallas, South Dakota'}];
-const MIN=1826,MAX=2026,$=document.getElementById('app');
-let rs,i,total,map,pin,guess;
+{f:'Louis-Emile Durandelle, The Eiffel Tower - State of the Construction, 1888.jpg',y:1888,lat:48.8584,lng:2.2945,p:'Eiffel Tower, Paris, France',h:'Built for the 1889 World\'s Fair, held to mark the centenary of the French Revolution. Photographed by Louis-Émile Durandelle as the ironwork climbed in 1888. At 300 m it was the tallest structure in the world until 1930, and was meant to be dismantled after 20 years.'},
+{f:'Bundesarchiv Bild 183-85458-0002, Berlin, Mauerbau, Kampfgruppen am Brandenburger Tor.jpg',y:1961,lat:52.5163,lng:13.3777,p:'Brandenburg Gate, Berlin, Germany',h:'East German forces sealed the border in Berlin overnight on 13 August 1961 to stop people leaving for the West. The barbed wire was soon replaced by concrete. The Wall stood until 9 November 1989.'},
+{f:'Apollo 11 Launch2.jpg',y:1969,lat:28.6084,lng:-80.6041,p:'Kennedy Space Center, Florida, USA',h:'Apollo 11 lifted off on a Saturn V from Launch Complex 39A on 16 July 1969. Four days later Neil Armstrong and Buzz Aldrin landed on the Moon while Michael Collins orbited above.'},
+{f:'First flight3.jpg',y:1903,lat:36.0146,lng:-75.6672,p:'Kill Devil Hills, North Carolina, USA',h:'On 17 December 1903 Orville Wright made the first powered, controlled flight in a heavier-than-air machine: 12 seconds and about 120 feet. The brothers made four flights that day, the longest lasting 59 seconds.'},
+{f:'Elizabeth II waves from the palace balcony after the Coronation, 1953.jpg',y:1953,lat:51.5014,lng:-0.1419,p:'Buckingham Palace, London, UK',h:'Elizabeth II was crowned in Westminster Abbey on 2 June 1953, the first coronation to be televised. Afterwards the royal family appeared on the balcony of Buckingham Palace to greet the crowds.'},
+{f:'Tower bridge works 1892.jpg',y:1892,lat:51.5055,lng:-0.0754,p:'Tower Bridge, London, UK',h:'Construction ran from 1886 to 1894. Two huge piers were sunk into the Thames and a steel frame was clad in stone to match the nearby Tower of London. It opened on 30 June 1894.'},
+{f:'Hiroshima after the Atom Bomb Strike 1945 taken by sailors of USS Tuscaloosa - Original.jpg',y:1945,lat:34.3853,lng:132.4553,p:'Hiroshima, Japan',h:'On 6 August 1945 the United States dropped an atomic bomb on Hiroshima, the first use of a nuclear weapon in war. It destroyed most of the city. Japan announced its surrender on 15 August.'},
+{f:'Labourers at work on the panama canal at Culebra Cut 1904.jpg',y:1904,lat:9.056,lng:-79.66,p:'Culebra Cut, Panama',h:'The United States began work in 1904 after the earlier French attempt failed. The Culebra Cut was the hardest stretch, a deep trench through the continental divide that suffered repeated landslides. The canal opened on 15 August 1914.'},
+{f:'Hiram Bingham at Machu Picchu, 1912.jpg',y:1912,lat:-13.1631,lng:-72.545,p:'Machu Picchu, Peru',h:'Yale\'s Hiram Bingham brought the Inca citadel to world attention in 1911 and led excavations the following year. It was built around 1450 and abandoned about a century later, and was never found by the Spanish.'},
+{f:'Construction Intake Towers Hoover Dam 1934.jpg',y:1934,lat:36.016,lng:-114.7377,p:'Hoover Dam, Nevada/Arizona, USA',h:'Built between 1931 and 1936 in Black Canyon on the Colorado River during the Great Depression. It created Lake Mead and employed thousands of workers. The intake towers feed water to the power station.'},
+{f:'Gandhi at Dandi 5 April 1930.jpg',y:1930,lat:20.887,lng:72.8091,p:'Dandi, Gujarat, India',h:'Mahatma Gandhi led the Salt March of about 240 miles over 24 days, from Sabarmati Ashram to the coast at Dandi, in protest at the British salt tax. He arrived on 5 April 1930 and made salt by hand the next morning.'},
+{f:'Sydney Opera House Under Construction in the mid-1960s 01.jpg',y:1965,lat:-33.8568,lng:151.2153,p:'Sydney Opera House, Australia',h:'Designed by Danish architect Jørn Utzon, with work starting in 1959. The shell roofs were far harder to build than expected, and costs and delays ballooned. It opened in 1973.'},
+{f:'Lunch atop a Skyscraper - Charles Clyde Ebbets.jpg',y:1932,lat:40.7587,lng:-73.9787,p:'Rockefeller Center, New York, USA',h:'Taken on 20 September 1932 during construction of the RCA Building (30 Rockefeller Plaza). Long credited to Charles Ebbets, the photographer has never been definitively confirmed.'},
+{f:'Lange-MigrantMother02.jpg',y:1936,lat:35.0422,lng:-120.4749,p:'Nipomo, California, USA',h:'Dorothea Lange photographed Florence Owens Thompson and her children for the Farm Security Administration. It became the defining image of the Great Depression.'},
+{f:'Raising the Flag on Iwo Jima, larger - edit1.jpg',y:1945,lat:24.7536,lng:141.2889,p:'Mount Suribachi, Iwo Jima, Japan',h:'Joe Rosenthal photographed US Marines raising a flag on Mount Suribachi on 23 February 1945 during the Battle of Iwo Jima. It won the Pulitzer Prize for Photography.'},
+{f:'Hindenburg disaster.jpg',y:1937,lat:40.03,lng:-74.353,p:'Lakehurst, New Jersey, USA',h:'The German airship Hindenburg caught fire while landing on 6 May 1937, killing 36 people. The footage and radio coverage ended the age of the passenger airship.'},
+{f:'Dust Bowl - Dallas, South Dakota 1936.jpg',y:1936,lat:43.23,lng:-99.51,p:'Dallas, South Dakota, USA',h:'Drought and over-ploughing in the 1930s turned parts of the Great Plains into the Dust Bowl, with storms stripping away the topsoil. Many farming families left the region.'}];
+const MIN=1830,MAX=2026,$=document.getElementById('app');
+const COL=['#f2a33a','#4cc9f0','#ef476f','#06d6a0','#b388ff','#ffd166','#ff8fab','#9ef01a'];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S={n:5,players:['Player 1']};
+try{const x=JSON.parse(localStorage.tardisSetup||'null');if(x&&x.players&&x.players.length)S={n:Math.min(x.n||5,ROUNDS.length),players:x.players}}catch(e){}
+const saveS=()=>{try{localStorage.tardisSetup=JSON.stringify(S)}catch(e){}};
+const bestKey=()=>'tardisBest'+S.n;
+const best=()=>{try{return +localStorage[bestKey()]||0}catch(e){return 0}};
 const km=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))};
-const best=()=>{try{return +localStorage.tgBest||0}catch(e){return 0}};
-function home(){$.innerHTML=`<div class=center><h1>Tardis</h1><div class=res>Guess where and when each photo was taken.<br>Best score: <b>${best()}</b></div><button id=go>Play</button></div>`;go.onclick=start}
-function start(){rs=[...ROUNDS].sort(()=>Math.random()-.5).slice(0,5);i=0;total=0;round()}
-function round(){const r=rs[i];guess=null;
-$.innerHTML=`<header><span>Round ${i+1}/${rs.length}</span><span>Score ${total}</span></header><div id=photo></div><div id=map></div>
-<div id=panel><div class=row><span>Year</span><span id=yv>1950</span></div><input id=year type=range min=${MIN} max=${MAX} value=1950><button id=ok disabled style="margin-top:10px">Tap map to place pin</button></div>`;
-photo.style.backgroundImage=`url("${F(r.f)}")`;
-map=L.map('map',{worldCopyJump:true,zoomControl:false}).setView([25,10],1);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);
-map.on('click',e=>{guess=e.latlng;pin?pin.setLatLng(guess):pin=L.marker(guess).addTo(map);ok.disabled=false;ok.textContent='Guess'});
-pin=null;year.oninput=()=>yv.textContent=year.value;ok.onclick=()=>reveal(r,+year.value)}
-function reveal(r,gy){const d=Math.round(km(guess.lat,guess.lng,r.lat,r.lng)),dy=Math.abs(gy-r.y);
-const ls=Math.round(5000*Math.exp(-d/1500)),ys=Math.max(0,5000-250*dy),s=ls+ys;total+=s;
-ok.disabled=true;L.marker([r.lat,r.lng]).addTo(map).bindPopup(r.p).openPopup();
-L.polyline([guess,[r.lat,r.lng]],{color:'#f2a33a',dashArray:'6'}).addTo(map);map.fitBounds([guess,[r.lat,r.lng]],{padding:[40,40],maxZoom:6});
-panel.innerHTML=`<div class=res><b>${r.p}, ${r.y}</b><br>You were <b>${d.toLocaleString()} km</b> off (${ls} pts) and <b>${dy} year${dy==1?'':'s'}</b> off (${ys} pts)<br>Round: <b>${s}</b></div><button id=nx>${i+1<rs.length?'Next':'Finish'}</button>`;
-nx.onclick=()=>{i++;i<rs.length?round():end()}}
-function end(){try{if(total>best())localStorage.tgBest=total}catch(e){}
-$.innerHTML=`<div class=center><div>Final score</div><div class=big>${total}</div><div class=res>out of ${rs.length*10000}</div><button id=again>Play again</button></div>`;again.onclick=start}
-home();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+const logo='<svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="190" fill="none" stroke="#f2a33a" stroke-width="40"/><path d="M256 140v120l80 50" fill="none" stroke="#f2a33a" stroke-width="40" stroke-linecap="round"/></svg>';
+let G,map;
+
+function setup(){
+ if(map){map.remove();map=null}
+ $.innerHTML=`<div class=shell><div class=setup>
+ <div class=brand style="font-size:22px">${logo}Tardis</div>
+ <h1>Where and when?</h1><div class=tag>Look at the photo, pin the place, pick the year.</div>
+ <div class=card><h2>Rounds</h2><div class=stepper><button class=sm id=rm>−</button><b id=rn>${S.n}</b><button class=sm id=rp>+</button><span style="color:var(--mut)">of ${ROUNDS.length} photos</span></div></div>
+ <div class=card><h2>Players</h2><ul id=pl></ul><div class=add><input id=nm placeholder="Add a player" maxlength=16><button class=sm id=ad>Add</button></div></div>
+ <button class=btn id=go>Start game</button>
+ <div class=tag style="text-align:center;margin:0">Best for ${S.n} rounds: <b style="color:var(--fg)">${best()}</b></div></div></div>`;
+ const list=()=>{pl.innerHTML=S.players.map((n,i)=>`<li class=pl><span class=dot style="background:${COL[i%8]}"></span><span class=n>${esc(n)}</span>${S.players.length>1?`<button class=sm data-i=${i}>Remove</button>`:''}</li>`).join('');
+  pl.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.players.splice(+b.dataset.i,1);saveS();list()});
+  ad.disabled=nm.disabled=S.players.length>=8};
+ rm.onclick=()=>{S.n=Math.max(1,S.n-1);rn.textContent=S.n;saveS()};
+ rp.onclick=()=>{S.n=Math.min(ROUNDS.length,S.n+1);rn.textContent=S.n;saveS()};
+ const add=()=>{const v=nm.value.trim();if(v&&S.players.length<8){S.players.push(v);nm.value='';saveS();list()}};
+ ad.onclick=add;nm.onkeydown=e=>{if(e.key==='Enter')add()};
+ go.onclick=start;list()}
+
+function start(){
+ G={rs:[...ROUNDS].sort(()=>Math.random()-.5).slice(0,S.n),i:0,pi:0,res:[],tot:S.players.map(()=>0)};
+ G.res=G.rs.map(()=>[]);turn()}
+
+function frame(rev){
+ if(map){map.remove();map=null}
+ const r=G.rs[G.i];
+ $.innerHTML=`<div class=shell><header><div class=brand>${logo}Tardis</div><span class=pill>Round ${G.i+1} / ${G.rs.length}</span>
+ <div class=chips>${S.players.map((n,i)=>`<span class="chip ${!rev&&i===G.pi?'on':''}"><span class=dot style="background:${COL[i%8]}"></span>${esc(n)} <b>${G.tot[i]}</b></span>`).join('')}</div></header>
+ <main><section class="left ${rev?'rev':''}"><div class=photo><img id=img alt="Mystery photo" src="${F(r.f)}"></div><div id=hist class="card hist" hidden></div></section>
+ <section class=right><div id=map></div><div id=panel class=card></div></section></main></div>`;
+ img.onerror=()=>{img.outerHTML='<div style="color:var(--mut);padding:20px">Could not load the photo. Check your connection.</div>'};
+ map=L.map('map',{worldCopyJump:true,zoomControl:true,minZoom:1}).setView([30,10],2);
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);
+ setTimeout(()=>map&&map.invalidateSize(),60)}
+
+function turn(){
+ frame(false);const r=G.rs[G.i],p=S.players[G.pi],c=COL[G.pi%8];let pin=null,guess=null;
+ panel.innerHTML=`${S.players.length>1?`<div class=who><span class=dot style="background:${c}"></span>${esc(p)}'s turn</div>`:''}
+ <div class=row><span>Year</span><span id=yv>1950</span></div><input id=year type=range min=${MIN} max=${MAX} value=1950>
+ <button class=btn id=ok disabled>Tap the map to place your pin</button>`;
+ map.on('click',e=>{guess=e.latlng;pin?pin.setLatLng(guess):pin=L.marker(guess).addTo(map);ok.disabled=false;ok.textContent='Lock in guess'});
+ year.oninput=()=>yv.textContent=year.value;
+ ok.onclick=()=>{
+  const gy=+year.value,d=Math.round(km(guess.lat,guess.lng,r.lat,r.lng)),dy=Math.abs(gy-r.y);
+  const ls=Math.round(5000*Math.exp(-d/1500)),ys=Math.max(0,5000-250*dy),s=ls+ys;
+  G.res[G.i][G.pi]={lat:guess.lat,lng:guess.lng,gy,d,dy,ls,ys,s};G.tot[G.pi]+=s;
+  if(G.pi+1<S.players.length){G.pi++;turn()}else reveal()}}
+
+function reveal(){
+ frame(true);const r=G.rs[G.i],R=G.res[G.i],pts=[[r.lat,r.lng]];
+ L.marker([r.lat,r.lng],{icon:L.divIcon({className:'',html:'<div class=star>⭐</div>',iconSize:[30,30],iconAnchor:[15,15]})}).addTo(map).bindPopup(esc(r.p));
+ R.forEach((x,i)=>{const c=COL[i%8];pts.push([x.lat,x.lng]);
+  L.marker([x.lat,x.lng],{icon:L.divIcon({className:'',html:`<div class=marker style="background:${c}">${esc(S.players[i][0].toUpperCase())}</div>`,iconSize:[26,26],iconAnchor:[13,13]})}).addTo(map);
+  L.polyline([[x.lat,x.lng],[r.lat,r.lng]],{color:c,dashArray:'6',weight:3}).addTo(map)});
+ map.fitBounds(pts,{padding:[50,50],maxZoom:7});
+ hist.hidden=false;hist.innerHTML=`<h3>${esc(r.p)}</h3><div class=sub>${r.y}</div><p>${esc(r.h)}</p>`;
+ const last=G.i+1>=G.rs.length;
+ panel.innerHTML=`<div class=truth>It was ${esc(r.p)}, ${r.y}</div><div class=res>${R.map((x,i)=>`<div class=pr><span class=dot style="background:${COL[i%8]}"></span><div>${esc(S.players[i])}<small>${x.d.toLocaleString()} km off · ${x.gy} (${x.dy} yr off)</small></div><b class=s>${x.s}</b></div>`).join('')}</div>
+ <button class=btn id=nx>${last?'See results':'Next round'}</button>`;
+ nx.onclick=()=>{if(last)end();else{G.i++;G.pi=0;turn()}}}
+
+function end(){
+ if(map){map.remove();map=null}
+ const order=S.players.map((n,i)=>({n,i,t:G.tot[i]})).sort((a,b)=>b.t-a.t),max=G.rs.length*10000,multi=S.players.length>1;
+ try{if(!multi&&order[0].t>best())localStorage[bestKey()]=order[0].t}catch(e){}
+ $.innerHTML=`<div class=shell><div class=final><div class=brand style="justify-content:center">${logo}Tardis</div>
+ <h1>${multi?esc(order[0].n)+' wins!':'Final score'}</h1><div style="color:var(--mut)">out of ${max.toLocaleString()}</div>
+ <div class="card lb">${order.map((o,k)=>`<div class=pr><b>${k+1}</b><span class=dot style="background:${COL[o.i%8]}"></span><span>${esc(o.n)}</span><b class=s>${o.t.toLocaleString()}</b></div>`).join('')}</div>
+ <button class=btn id=again>Play again</button><button class="btn ghost" id=cfg>Change rounds or players</button></div></div>`;
+ again.onclick=start;cfg.onclick=setup}
+
+setup();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>

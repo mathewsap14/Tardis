@@ -193,6 +193,7 @@ function end(){
  cfg.onclick=setup}
 
 /* ---------- online (peer-to-peer via PeerJS) ---------- */
+const ICE={config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:openrelay.metered.ca:80'},{urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},{urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},{urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}]}};
 const bc=m=>{if(NET&&NET.conns)NET.conns.forEach(c=>{try{c.open&&c.send(m)}catch(e){}})};
 const joinLink=id=>location.origin+location.pathname+'#join='+id;
 function shell(inner){killMap();$.innerHTML=`<div class=shell><div class=setup><div class=brand style="font-size:22px">${logo}Tardis</div>${inner}</div></div>`}
@@ -209,7 +210,7 @@ function hostScreen(){
 
 function hostStart(name){
  const b=document.getElementById('mk');if(b){b.disabled=true;b.textContent='Creating…'}
- const id='tardis-'+Math.random().toString(36).slice(2,8),peer=new Peer(id);
+ const id='tardis-'+Math.random().toString(36).slice(2,8),peer=new Peer(id,ICE);
  NET={role:'host',peer,conns:[],names:[name],gone:{},id};
  peer.on('open',()=>hostLobby());
  peer.on('connection',c=>{c.on('data',m=>hostMsg(c,m));c.on('close',()=>hostLeft(c));c.on('error',()=>hostLeft(c))});
@@ -281,8 +282,8 @@ function joinScreen(id){
 
 function guestFail(msg){leaveNet();shell(`<h1>Couldn't join</h1><p class="hint err">${esc(msg)}</p><button class=btn id=bk>Back to start</button>`);bk.onclick=setup}
 function guestJoin(id,name){
- const peer=new Peer();NET={role:'guest',peer,names:[]};
- const timer=setTimeout(()=>{if(NET&&!NET.welcomed)guestFail('Could not reach the host. Make sure the host still has the game open, then try again. Some mobile networks block direct connections.')},20000);
+ const peer=new Peer(undefined,ICE);NET={role:'guest',peer,names:[]};
+ const timer=setTimeout(()=>{if(NET&&!NET.welcomed)guestFail('Could not reach the host. Make sure the host still has the game open, then try again. Some mobile networks block direct connections.')},30000);
  peer.on('open',()=>{const c=peer.connect(id,{reliable:true});NET.conn=c;
   c.on('open',()=>c.send({t:'hello',name,ver:ROUNDS.length}));
   c.on('data',guestMsg);

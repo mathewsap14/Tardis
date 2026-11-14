@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#14110f"><link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg">
-<meta name="apple-mobile-web-app-capable" content="yes"><title>TimeGuess</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><title>Tardis</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{--bg:#14110f;--card:#221d19;--fg:#f4ece3;--mut:#a89d92;--acc:#f2a33a}
@@ -35,7 +35,7 @@ const MIN=1826,MAX=2026,$=document.getElementById('app');
 let rs,i,total,map,pin,guess;
 const km=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))};
 const best=()=>{try{return +localStorage.tgBest||0}catch(e){return 0}};
-function home(){$.innerHTML=`<div class=center><h1>TimeGuess</h1><div class=res>Guess where and when each photo was taken.<br>Best score: <b>${best()}</b></div><button id=go>Play</button></div>`;go.onclick=start}
+function home(){$.innerHTML=`<div class=center><h1>Tardis</h1><div class=res>Guess where and when each photo was taken.<br>Best score: <b>${best()}</b></div><button id=go>Play</button></div>`;go.onclick=start}
 function start(){rs=[...ROUNDS].sort(()=>Math.random()-.5).slice(0,5);i=0;total=0;round()}
 function round(){const r=rs[i];guess=null;
 $.innerHTML=`<header><span>Round ${i+1}/${rs.length}</span><span>Score ${total}</span></header><div id=photo></div><div id=map></div>

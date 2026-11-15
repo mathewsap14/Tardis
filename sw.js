@@ -1,4 +1,4 @@
-const C='tardis-v7';
+const C='tardis-v8';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon.svg'])))});
 self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;
